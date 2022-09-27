@@ -1,102 +1,74 @@
+import { Button } from "bootstrap";
 import React, { useState } from "react";
-import Rate from "./Rate";
 import Modal from "react-modal";
-
-const customStyles = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-  },
-};
 Modal.setAppElement("#root");
 
-const AddMovie = ({ handleAdd }) => {
-  const [modalIsOpen, setIsOpen] = useState(false);
-  const [form, setForm] = useState({
-    title: "",
-    posterUrl: "",
-    description: "",
-    rate: 1,
-  });
+const AddMovie = (props) => {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [posterURL, setPosterURL] = useState("");
+  const [description, setDescription] = useState("");
+  const [rating, setRating] = useState("");
 
-  function clearForm() {
-    setForm({
-      title: "",
-      posterUrl: "",
-      description: "",
-      rate: 1,
-    });
-  }
-  function openModal() {
-    clearForm();
-    setIsOpen(true);
-  }
-
-  function closeModal() {
-    setIsOpen(false);
-  }
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const openModal = () => setModalIsOpen(true);
+  const closeModal = () => setModalIsOpen(false);
+  const handleAdd = () => {
+    const newMovie = {
+      id: Math.floor(Math.random() * 1000),
+      title,
+      posterURL,
+      description,
+      rating: +rating,
+    };
+    props.add(newMovie);
+    setTitle("");
+    setPosterURL("");
+    setDescription("");
+    setRating("");
+    closeModal();
   };
-
-  const handleRate = (rate) => setForm({ ...form, rate: rate });
 
   return (
     <div>
-      <button className="btn" onClick={openModal}>
-        Add Movie
-      </button>
-      <Modal
-        isOpen={modalIsOpen}
-        style={customStyles}
-        onRequestClose={closeModal}
+      <button
+        style={{ margin: "2rem", border: "solid 1px black", padding: "5px" }}
+        onClick={openModal}
       >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            let newMovie = {
-              ...form,
-              id: Math.random(),
-            };
-            handleAdd(newMovie);
-            closeModal();
-          }}
-        >
-          <h2>Add new movie</h2>
-          <label>Movie name: </label>
+        add movie
+      </button>
+      <Modal isOpen={modalIsOpen} onRequestClose={closeModal}>
+        <h1 style={{ color: "black" }}>Add Movie</h1>
+        <form>
           <input
             type="text"
-            value={form.title}
             name="title"
-            onChange={handleChange}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
-          <br />
-          <label>Movie image: </label>
           <input
             type="url"
-            value={form.posterUrl}
-            name="posterUrl"
-            onChange={handleChange}
+            name="posterURL"
+            value={posterURL}
+            onChange={(e) => setPosterURL(e.target.value)}
           />
-          <br />
-          <label>Movie description: </label>
           <input
-            type="text"
-            value={form.description}
-            name="description"
-            onChange={handleChange}
+            type="number"
+            name="rating"
+            min="1"
+            max="5"
+            value={rating}
+            onChange={(e) => setRating(e.target.value)}
           />
-          <br />
-          <label>Movie rate</label>
-          <Rate rate={form.rate} handleRate={handleRate} />
-          <button type="submit">Add</button>
-          <button onClick={closeModal}>Cancel</button>
+          <textarea
+            name="description"
+            cols="30"
+            rows="10"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          ></textarea>
         </form>
+        <button onClick={handleAdd}>add</button>
+        <button onClick={closeModal}>close</button>
       </Modal>
     </div>
   );
